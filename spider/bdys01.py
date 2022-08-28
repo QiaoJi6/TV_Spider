@@ -11,6 +11,7 @@ urllib3.util.timeout.Timeout._validate_timeout = lambda *args: 5 if args[2] != '
 
 
 Tag = "bdys01"
+Tag_name = "哔滴影视"
 siteUrl = "https://www.bdys01.com"
 
 
@@ -51,25 +52,30 @@ def cacu(code):
 
 
 def verifyCode(key):
-    while True:
-        session = requests.session()
-        ocr = ddddocr.DdddOcr()
-        img = session.get(
-            url=f"https://www.bdys01.com/search/verifyCode?t={str(int(round(time.time() * 1000)))}",
-            headers=getHeaders(siteUrl)
-        ).content
-        # with open("verifyCode.jpg", 'wb') as f:
-        #     f.write(img)
-        code = cacu(ocr.classification(img))
-        url = f"{siteUrl}/search/{quote_plus(key)}?code={code}"
-        res = session.get(
-            url=url,
-            headers=getHeaders(url.split("?")[0])
-        ).text
-        if "/search/verifyCode?t=" not in res:
-            return res
-        time.sleep(1)
-
+    retry = 5
+    while retry:
+        try:
+            session = requests.session()
+            ocr = ddddocr.DdddOcr()
+            img = session.get(
+                url=f"https://www.bdys01.com/search/verifyCode?t={str(int(round(time.time() * 1000)))}",
+                headers=getHeaders(siteUrl)
+            ).content
+            # with open("verifyCode.jpg", 'wb') as f:
+            #     f.write(img)
+            code = cacu(ocr.classification(img))
+            url = f"{siteUrl}/search/{quote_plus(key)}?code={code}"
+            res = session.get(
+                url=url,
+                headers=getHeaders(url.split("?")[0])
+            ).text
+            if "/search/verifyCode?t=" not in res:
+                return res
+            # time.sleep(1)
+        except Exception as e:
+            print(e)
+        finally:
+            retry = retry - 1
 
 def searchContent(key, token):
     try:
@@ -84,7 +90,7 @@ def searchContent(key, token):
                     "vod_id": f'{Tag}${vod.a["href"].split(".")[0]}',
                     "vod_name": vod_name,
                     "vod_pic": vod.img["src"],
-                    "vod_remarks": Tag + " " + vod.select_one("div.card-body.py-0.pe-1").a.get_text()
+                    "vod_remarks": Tag_name + " " + vod.select_one("div.card-body.py-0.pe-1").a.get_text()
                 })
         return videos
     except Exception as e:

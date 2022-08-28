@@ -13,6 +13,7 @@ urllib3.util.timeout.Timeout._validate_timeout = lambda *args: 5 if args[2] != '
 
 
 Tag = "cokemv"
+Tag_name = "COKEMV影视"
 siteUrl = "https://cokemv.me"
 playerConfig = {
     "cokemv0555": {"sh": "COKEMV", "pu": "", "sn": 0, "or": 999},
@@ -49,18 +50,23 @@ def getHeaders(url):
 
 
 def verifyCode(url):
-    while True:
-        session = requests.session()
-        ocr = ddddocr.DdddOcr()
-        img = session.get(url="https://cokemv.me/index.php/verify/index.html?", headers=getHeaders(url)).content
-        code = ocr.classification(img)
-        res = session.post(
-            url=f"https://cokemv.me/index.php/ajax/verify_check?type=search&verify={code}",
-            headers=getHeaders(url)
-        ).json()
-        if res["msg"] == "ok":
-            return session
-        time.sleep(1)
+    retry = 5
+    while retry:
+        try:
+            session = requests.session()
+            ocr = ddddocr.DdddOcr()
+            img = session.get(url="https://cokemv.me/index.php/verify/index.html?", headers=getHeaders(url)).content
+            code = ocr.classification(img)
+            res = session.post(
+                url=f"https://cokemv.me/index.php/ajax/verify_check?type=search&verify={code}",
+                headers=getHeaders(url)
+            ).json()
+            if res["msg"] == "ok":
+                return session
+        except Exception as e:
+            print(e)
+        finally:
+            retry = retry - 1
 
 
 def searchContent(key, token):
@@ -75,7 +81,7 @@ def searchContent(key, token):
                 "vod_id": f'{Tag}${vod.a["href"].split("/")[-1].split(".")[0]}',
                 "vod_name": vod.strong.get_text().strip(),
                 "vod_pic": vod.img["data-original"],
-                "vod_remarks": Tag + " " + vod.select_one(".module-item-note").get_text()
+                "vod_remarks": Tag_name + " " + vod.select_one(".module-item-note").get_text()
             })
         return videos
     except Exception as e:

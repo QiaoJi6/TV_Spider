@@ -28,9 +28,11 @@ if [[ $md5n != $md5o && -s /tmp/tvsp.zip ]];then
  rm -rf $dkdir/app.py
  rm -rf $dkdir/utils/
  rm -rf $dkdir/spider/
+ rm -rf $dkdir/json/
  cp  /tmp/tvsp/TV_Spider-main/app.py $dkdir/app.py
  cp -r /tmp/tvsp/TV_Spider-main/utils/ $dkdir/utils/
  cp -r /tmp/tvsp/TV_Spider-main/spider/ $dkdir/spider/
+ cp -r /tmp/tvsp/TV_Spider-main/json/ $dkdir/json/
  rqmd5o=$(md5sum /tmp/tvsp/TV_Spider-main/requirements.txt | awk '{print $1}')
  rqmd5n=$(md5sum $dkdir/requirements.txt | awk '{print $1}')
  #依赖变更，更新镜像
@@ -49,6 +51,7 @@ if [[ $md5n != $md5o && -s /tmp/tvsp.zip ]];then
   mv /tmp/tvsp/TV_Spider-main/app.py $dkdir/app.py
   mv /tmp/tvsp/TV_Spider-main/utils/ $dkdir/utils/
   mv /tmp/tvsp/TV_Spider-main/spider/ $dkdir/spider/
+  mv /tmp/tvsp/TV_Spider-main/json/ $dkdir/json/
   #运行DOCKER
   docker run --restart=always --name $contname --net="host" -v $dkdir:/TV $imgtag 2>&1 &
  fi

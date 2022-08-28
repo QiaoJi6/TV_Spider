@@ -12,6 +12,7 @@ urllib3.util.timeout.Timeout._validate_timeout = lambda *args: 5 if args[2] != '
 
 
 Tag = "bttwoo"
+Tag_name = "两个BT"
 siteUrl = "https://www.bttwoo.com"
 
 
@@ -67,7 +68,7 @@ def searchContent(key, token):
                     "vod_id": f'{Tag}${vod.a["href"].split("/")[-1].split(".")[0]}',
                     "vod_name": name,
                     "vod_pic": vod.img["data-original"],
-                    "vod_remarks": Tag + " " + vod.span.get_text()
+                    "vod_remarks": Tag_name + " " + vod.span.get_text()
                 })
         return videos
     except Exception as e:
@@ -219,9 +220,9 @@ def playerContent(ids, flag, token):
 
 
 if __name__ == '__main__':
-    res = searchContent("冰雨火", "")
-    res = detailContent('bttwoo$80974', "")
+    # res = searchContent("冰雨火", "")
+    res = detailContent('bttwoo$52995', "")
     # func = "playerContent"
-    res = playerContent("bttwoo___bXZfODA5NzQtbm1fMg==", "", "")
+    # res = playerContent("bttwoo___bXZfODA5NzQtbm1fMg==", "", "")
     # res = eval(func)("68614-1-1")
     print(res)
