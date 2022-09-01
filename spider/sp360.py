@@ -60,20 +60,30 @@ def detailContent(ids, token):
         for site in data.get("playlink_sites", []):
             playList = ""
             vodItems = []
-            total = int(data["allupinfo"][site])
-            for start in range(1, total, delta):
-                end = total if (start + delta) > total else start + delta - 1
-                vod_data = requests.get(
-                    url=url,
-                    params={
-                        "start": start,
-                        "end": end,
-                        "site": site
-                    },
-                    headers=getHeaders()
-                ).json()["data"]["allepidetail"]
-                for item in vod_data[site]:
-                    vodItems.append(item.get("playlink_num", "") + "$" + f"{Tag}___" + item.get("url", ""))
+            if "allupinfo" in data:
+                total = int(data["allupinfo"][site])
+                for start in range(1, total, delta):
+                    end = total if (start + delta) > total else start + delta - 1
+                    vod_data = requests.get(
+                        url=url,
+                        params={
+                            "start": start,
+                            "end": end,
+                            "site": site
+                        },
+                        headers=getHeaders()
+                    ).json()["data"]
+                    if "allepidetail" in vod_data:
+                        vod_data = vod_data["allepidetail"]
+                        for item in vod_data[site]:
+                            vodItems.append(item.get("playlink_num", "") + "$" + f"{Tag}___" + item.get("url", ""))
+                    else:
+                        vod_data = vod_data['defaultepisode']
+                        for item in vod_data:
+                            vodItems.append(item.get('period', "") + item.get('name', "") + "$" + f"{Tag}___" + item.get("url", ""))
+            else:
+                item = data["playlinksdetail"][site]
+                vodItems.append(item.get("sort", "") + "$" + f"{Tag}___" + item.get("default_url", ""))
             if len(vodItems):
                 playList = "#".join(vodItems)
             if len(playList) == 0:
@@ -104,5 +114,5 @@ def playerContent(ids, flag, token):
 
 if __name__ == '__main__':
     # res = searchContent("梦华录", "")
-    res = detailContent('360kan$2_RbRxbH7lTGTlOH', "")
+    res = detailContent('sp360$3_ZcQmaqZv7ZIAED', "")
     print(res)

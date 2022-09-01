@@ -119,6 +119,9 @@ def detailContent(ids, token):
 
         # 取播放列表数据
         sources = doc.select("div.paly_list_btn > a")
+        if len(sources) == 0:
+            print("当前没有可播放的内容")
+            return []
         vodItems = []
         for source in sources:
             sourceName = source.get_text()
@@ -222,8 +225,8 @@ def playerContent(ids, flag, token):
 
 
 if __name__ == '__main__':
-    res = searchContent("星汉灿烂")
-    # res = detailContent(163)
+    # res = searchContent("星汉灿烂")
+    res = detailContent("czspp$11727", "")
     # func = "playerContent"
     # res = playerContent("bXZfNDg2Mi1ubV82")
     # res = eval(func)("68614-1-1")
