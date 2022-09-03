@@ -27,13 +27,13 @@ site_list = [
     "zhaoziyuan"
 ]
 
-with open('./json/douban.json', "r", encoding="utf-8") as f:
-    douban_filter = json.load(f)
-
 
 @app.route('/vod')
 def vod():
     try:
+        with open('./json/douban.json', "r", encoding="utf-8") as f:
+            douban_filter = json.load(f)
+
         wd = request.args.get('wd')
         ac = request.args.get('ac')
         quick = request.args.get('quick')
@@ -45,16 +45,23 @@ def vod():
         ext = request.args.get('ext')
         ids = request.args.get('ids')
         q = request.args.get('q')
+        douban_id = request.args.get('douban')
 
         sites = request.args.get('sites')
         ali_token = request.args.get('ali_token')
         try:
             timeout = int(request.args.get('timeout'))
         except Exception as e:
-            timeout = 5
+            timeout = 10
 
         if not ali_token:
             ali_token = ""
+
+        if not douban_id:
+            douban_id = ""
+            douban_filter["class"].pop(0)
+            douban_filter["filters"].pop("interests")
+
 
         # 站点筛选
         search_sites = []
@@ -71,7 +78,7 @@ def vod():
 
         # 分类数据
         if t:
-            return douban.cate_filter(t, ext, pg)
+            return douban.cate_filter(t, ext, pg, douban_id)
 
         # 搜索
         if wd:
@@ -97,21 +104,9 @@ def vod():
         # 详情
         if ac:
             if len(ids.split('$')) < 2:
-                return jsonify({
-                    "list": [{
-                        "vod_id": "",
-                        "vod_name": "请在设置中开启聚合模式，或尝试在上一页面长按图片搜索，或更新软件",
-                        "vod_pic": "",
-                        "type_name": "",
-                        "vod_year": "",
-                        "vod_area": "https://github.com/sec-an/TV_Spider",
-                        "vod_remarks": "",
-                        "vod_actor": "https://github.com/sec-an/TV_Spider",
-                        "vod_director": "https://github.com/sec-an/TV_Spider",
-                        "vod_content": "T4分类页面由豆瓣APP数据实时生成，与其他网站无关，故无法直接播放，需要开启聚合模式或在上一页面长按图片进入搜索或更新软件至最新版本，感谢理解与支持！"
-                    }]
-                })
-            vodList = eval(f"{ids.split('$')[0]}.detailContent")(ids, ali_token)
+                vodList = douban.douban_detail(ids)
+            else:
+                vodList = eval(f"{ids.split('$')[0]}.detailContent")(ids, ali_token)
             return jsonify({
                 "list": vodList
             })
