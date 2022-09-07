@@ -7,3 +7,4 @@ requests
 aligo
 gunicorn
 websockets
+cryptography
